@@ -1,0 +1,4 @@
+streamlit
+pandas
+plotly
+nextmv==0.37.2

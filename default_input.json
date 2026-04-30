@@ -1,0 +1,384 @@
+{
+  "parameters": {
+    "categories": [
+      "TMT",
+      "Structural",
+      "Pipes",
+      "Sheets"
+    ],
+    "budget": 100000000,
+    "skus": [
+      {
+        "category": "TMT",
+        "sku": "Tata_10mm",
+        "forecast": 55.67,
+        "stock": 2,
+        "dead_stock": 0,
+        "scrap_stock": 0,
+        "purchase_cost": 62000,
+        "selling_price": 69000,
+        "share_lower": 0.05,
+        "share_upper": 0.18,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 10000,
+        "hold_penalty": 500,
+        "rec_base": 55200,
+        "rec_promo": 41400,
+        "rec_scrap": 27900,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "TMT",
+        "sku": "Tata_12mm",
+        "forecast": 55.67,
+        "stock": 5,
+        "dead_stock": 0,
+        "scrap_stock": 0,
+        "purchase_cost": 62500,
+        "selling_price": 70000,
+        "share_lower": 0.15,
+        "share_upper": 0.32,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 10500,
+        "hold_penalty": 500,
+        "rec_base": 56000,
+        "rec_promo": 42000,
+        "rec_scrap": 28125,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "TMT",
+        "sku": "Tata_16mm",
+        "forecast": 55.67,
+        "stock": 0,
+        "dead_stock": 0,
+        "scrap_stock": 0,
+        "purchase_cost": 62300,
+        "selling_price": 69800,
+        "share_lower": 0.08,
+        "share_upper": 0.2,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 10500,
+        "hold_penalty": 500,
+        "rec_base": 55840,
+        "rec_promo": 41880,
+        "rec_scrap": 28035,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "TMT",
+        "sku": "JSW_10mm",
+        "forecast": 55.67,
+        "stock": 2,
+        "dead_stock": 0,
+        "scrap_stock": 0,
+        "purchase_cost": 61000,
+        "selling_price": 68000,
+        "share_lower": 0.05,
+        "share_upper": 0.15,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 10000,
+        "hold_penalty": 500,
+        "rec_base": 54400,
+        "rec_promo": 40800,
+        "rec_scrap": 27450,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "TMT",
+        "sku": "JSW_12mm",
+        "forecast": 55.67,
+        "stock": 7,
+        "dead_stock": 0,
+        "scrap_stock": 0,
+        "purchase_cost": 61500,
+        "selling_price": 69000,
+        "share_lower": 0.15,
+        "share_upper": 0.3,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 10500,
+        "hold_penalty": 500,
+        "rec_base": 55200,
+        "rec_promo": 41400,
+        "rec_scrap": 27675,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "TMT",
+        "sku": "JSW_16mm",
+        "forecast": 55.67,
+        "stock": 0,
+        "dead_stock": 0,
+        "scrap_stock": 0,
+        "purchase_cost": 61300,
+        "selling_price": 68800,
+        "share_lower": 0.06,
+        "share_upper": 0.18,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 10500,
+        "hold_penalty": 500,
+        "rec_base": 55040,
+        "rec_promo": 41280,
+        "rec_scrap": 27585,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "TMT",
+        "sku": "Local_12mm",
+        "forecast": 55.67,
+        "stock": 2,
+        "dead_stock": 1,
+        "scrap_stock": 0,
+        "purchase_cost": 58500,
+        "selling_price": 65000,
+        "share_lower": 0.03,
+        "share_upper": 0.12,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 9500,
+        "hold_penalty": 500,
+        "rec_base": 52000,
+        "rec_promo": 39000,
+        "rec_scrap": 26325,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "TMT",
+        "sku": "Local_16mm",
+        "forecast": 55.67,
+        "stock": 5,
+        "dead_stock": 3,
+        "scrap_stock": 0,
+        "purchase_cost": 58300,
+        "selling_price": 64800,
+        "share_lower": 0.02,
+        "share_upper": 0.08,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 9500,
+        "hold_penalty": 500,
+        "rec_base": 51840,
+        "rec_promo": 38880,
+        "rec_scrap": 26235,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "Structural",
+        "sku": "Angle_75x75",
+        "forecast": 21.0,
+        "stock": 12,
+        "dead_stock": 8,
+        "scrap_stock": 4,
+        "purchase_cost": 60000,
+        "selling_price": 66000,
+        "share_lower": 0.1,
+        "share_upper": 0.35,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.4,
+        "short_penalty": 9000,
+        "hold_penalty": 1500,
+        "rec_base": 52800,
+        "rec_promo": 39600,
+        "rec_scrap": 27000,
+        "channels": [
+          "discount",
+          "scrap"
+        ]
+      },
+      {
+        "category": "Structural",
+        "sku": "Channel_100",
+        "forecast": 21.0,
+        "stock": 5,
+        "dead_stock": 1,
+        "scrap_stock": 0,
+        "purchase_cost": 60500,
+        "selling_price": 67000,
+        "share_lower": 0.35,
+        "share_upper": 0.6,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 9500,
+        "hold_penalty": 500,
+        "rec_base": 53600,
+        "rec_promo": 40200,
+        "rec_scrap": 27225,
+        "channels": [
+          "discount"
+        ]
+      },
+      {
+        "category": "Structural",
+        "sku": "Beam_200",
+        "forecast": 21.0,
+        "stock": 6,
+        "dead_stock": 2,
+        "scrap_stock": 1,
+        "purchase_cost": 61000,
+        "selling_price": 67500,
+        "share_lower": 0.1,
+        "share_upper": 0.3,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.3,
+        "short_penalty": 9500,
+        "hold_penalty": 1200,
+        "rec_base": 54000,
+        "rec_promo": 40500,
+        "rec_scrap": 27450,
+        "channels": [
+          "discount",
+          "scrap"
+        ]
+      },
+      {
+        "category": "Pipes",
+        "sku": "GI_1inch",
+        "forecast": 38.0,
+        "stock": 8,
+        "dead_stock": 0,
+        "scrap_stock": 0,
+        "purchase_cost": 71000,
+        "selling_price": 79000,
+        "share_lower": 0.4,
+        "share_upper": 0.7,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 11000,
+        "hold_penalty": 500,
+        "rec_base": 63200,
+        "rec_promo": 47400,
+        "rec_scrap": 31950,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "Pipes",
+        "sku": "GI_2inch",
+        "forecast": 38.0,
+        "stock": 7,
+        "dead_stock": 0,
+        "scrap_stock": 0,
+        "purchase_cost": 71500,
+        "selling_price": 79500,
+        "share_lower": 0.3,
+        "share_upper": 0.6,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 11000,
+        "hold_penalty": 500,
+        "rec_base": 63600,
+        "rec_promo": 47700,
+        "rec_scrap": 32175,
+        "channels": [
+          "base"
+        ]
+      },
+      {
+        "category": "Sheets",
+        "sku": "Plate_6mm",
+        "forecast": 22.0,
+        "stock": 5,
+        "dead_stock": 0,
+        "scrap_stock": 0,
+        "purchase_cost": 64500,
+        "selling_price": 72000,
+        "share_lower": 0.35,
+        "share_upper": 0.75,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.0,
+        "short_penalty": 10500,
+        "hold_penalty": 500,
+        "rec_base": 57600,
+        "rec_promo": 43200,
+        "rec_scrap": 29025,
+        "channels": [
+          "discount"
+        ]
+      },
+      {
+        "category": "Sheets",
+        "sku": "Plate_12mm",
+        "forecast": 22.0,
+        "stock": 10,
+        "dead_stock": 7,
+        "scrap_stock": 2,
+        "purchase_cost": 65000,
+        "selling_price": 72500,
+        "share_lower": 0.15,
+        "share_upper": 0.45,
+        "alpha_base": 0.2,
+        "alpha_discount": 0.3,
+        "alpha_scrap": 0.4,
+        "short_penalty": 10500,
+        "hold_penalty": 1800,
+        "rec_base": 58000,
+        "rec_promo": 43500,
+        "rec_scrap": 29250,
+        "channels": [
+          "discount",
+          "scrap"
+        ]
+      }
+    ],
+    "theta": [
+      {
+        "target_category": "Structural",
+        "target_sku": "Angle_75x75",
+        "driver_category": "TMT",
+        "driver_sku": "Tata_12mm",
+        "value": 0.05
+      },
+      {
+        "target_category": "Structural",
+        "target_sku": "Angle_75x75",
+        "driver_category": "TMT",
+        "driver_sku": "JSW_12mm",
+        "value": 0.05
+      },
+      {
+        "target_category": "Sheets",
+        "target_sku": "Plate_12mm",
+        "driver_category": "Structural",
+        "driver_sku": "Channel_100",
+        "value": 0.08
+      }
+    ]
+  }
+}
