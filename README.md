@@ -6,6 +6,10 @@ It does not contain the optimization model code. It sends input data to the
 deployed Nextmv Cloud app and displays the returned solution, tables, and
 graphs.
 
+Backend identifiers are configured through Streamlit secrets and are not shown
+to users. The UI includes scenario presets, editable SKU/theta tables, and
+scenario JSON import/export.
+
 ## Streamlit Cloud
 
 Use this as the app entry point:

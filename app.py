@@ -88,6 +88,36 @@ def load_default_parameters():
         return json.load(file)["parameters"]
 
 
+def load_working_parameters():
+    if "working_parameters" not in st.session_state:
+        st.session_state.working_parameters = load_default_parameters()
+    return deepcopy(st.session_state.working_parameters)
+
+
+def apply_uploaded_parameters():
+    uploaded = st.file_uploader("Import scenario JSON", type=["json"])
+    if uploaded is None:
+        return
+
+    try:
+        payload = json.load(uploaded)
+        parameters = payload.get("parameters", payload)
+        validate_payload = {
+            "categories": parameters["categories"],
+            "budget": parameters["budget"],
+            "skus": parameters["skus"],
+            "theta": parameters.get("theta", []),
+        }
+        st.session_state.working_parameters = validate_payload
+        st.session_state.pop("sku_input_editor", None)
+        st.session_state.pop("theta_input_editor", None)
+        st.session_state.pop("run_output", None)
+        st.success("Scenario imported. Review the tables, then run optimization.")
+        st.rerun()
+    except Exception as exc:
+        st.error(f"Could not import scenario JSON: {exc}")
+
+
 def sku_rows_to_dataframe(parameters):
     rows = []
     for row in parameters["skus"]:
@@ -221,10 +251,28 @@ def validate_parameters(parameters):
     return errors
 
 
+def scenario_counts(parameters):
+    return {
+        "categories": len(parameters["categories"]),
+        "skus": len(parameters["skus"]),
+        "theta": len(parameters.get("theta", [])),
+        "dead_stock_skus": sum(1 for row in parameters["skus"] if row["dead_stock"] > 0),
+        "scrap_skus": sum(1 for row in parameters["skus"] if row["scrap_stock"] > 0),
+    }
+
+
 def render_parameter_editor(parameters):
     edited = deepcopy(parameters)
     st.subheader("Input Data")
     st.caption("Edit SKU-level inputs here. Forecast and budget are controlled by the sidebar sliders.")
+
+    counts = scenario_counts(edited)
+    cols = st.columns(5)
+    cols[0].metric("Categories", counts["categories"])
+    cols[1].metric("SKUs", counts["skus"])
+    cols[2].metric("Theta links", counts["theta"])
+    cols[3].metric("Dead-stock SKUs", counts["dead_stock_skus"])
+    cols[4].metric("Scrap SKUs", counts["scrap_skus"])
 
     with st.expander("SKU data", expanded=False):
         sku_df = sku_rows_to_dataframe(edited)
@@ -424,25 +472,87 @@ def run_model_nextmv(parameters, options, cloud_config):
         return None, [], None, str(exc)
 
 
+def preset_defaults(parameters):
+    base_forecasts = {
+        option_key("forecast", row["category"]): float(row["forecast"])
+        for row in parameters["skus"]
+    }
+    presets = {
+        "Baseline": {
+            "budget": float(parameters["budget"]),
+            "forecast_factor": 1.0,
+            "base_usage_multiplier": 1.0,
+            "discount_usage_multiplier": 1.0,
+            "scrap_usage_multiplier": 1.0,
+            "short_penalty_multiplier": 1.0,
+            "holding_penalty_multiplier": 1.0,
+            "recovery_multiplier": 1.0,
+        },
+        "Tight budget": {
+            "budget": min(float(parameters["budget"]), 50_000_000.0),
+            "forecast_factor": 1.0,
+            "base_usage_multiplier": 1.0,
+            "discount_usage_multiplier": 1.0,
+            "scrap_usage_multiplier": 1.0,
+            "short_penalty_multiplier": 1.2,
+            "holding_penalty_multiplier": 1.0,
+            "recovery_multiplier": 1.0,
+        },
+        "High demand": {
+            "budget": float(parameters["budget"]),
+            "forecast_factor": 1.25,
+            "base_usage_multiplier": 1.0,
+            "discount_usage_multiplier": 1.0,
+            "scrap_usage_multiplier": 1.0,
+            "short_penalty_multiplier": 1.4,
+            "holding_penalty_multiplier": 1.0,
+            "recovery_multiplier": 1.0,
+        },
+        "Aggressive recovery": {
+            "budget": float(parameters["budget"]),
+            "forecast_factor": 1.0,
+            "base_usage_multiplier": 1.5,
+            "discount_usage_multiplier": 1.5,
+            "scrap_usage_multiplier": 1.5,
+            "short_penalty_multiplier": 1.0,
+            "holding_penalty_multiplier": 1.2,
+            "recovery_multiplier": 1.1,
+        },
+        "Conservative recovery": {
+            "budget": float(parameters["budget"]),
+            "forecast_factor": 1.0,
+            "base_usage_multiplier": 0.75,
+            "discount_usage_multiplier": 0.75,
+            "scrap_usage_multiplier": 0.75,
+            "short_penalty_multiplier": 1.0,
+            "holding_penalty_multiplier": 0.9,
+            "recovery_multiplier": 0.9,
+        },
+    }
+
+    for preset in presets.values():
+        for key, value in base_forecasts.items():
+            preset[key] = min(200.0, value * preset["forecast_factor"])
+
+    return presets
+
+
 def build_options_ui(parameters):
     st.sidebar.header("Scenario Controls")
+    st.sidebar.caption("Backend connected")
+    presets = preset_defaults(parameters)
+    preset_name = st.sidebar.selectbox("Scenario preset", list(presets), index=0)
+    preset = presets[preset_name]
+    preset_key = option_key("preset", preset_name)
 
     with st.sidebar.form("scenario_form"):
-        st.caption("Backend: Nextmv Cloud")
-        app_id = st.text_input(
-            "Nextmv App ID",
-            value=get_secret("NEXTMV_APP_ID", "steel-center"),
-            help="Use the exact app id shown in Nextmv Cloud. A 404 means this value is wrong.",
-        )
-        instance_id = st.text_input("Nextmv Instance ID", value=get_secret("NEXTMV_INSTANCE_ID", "devint"))
-
-        st.divider()
         budget = st.slider(
             "Budget",
             min_value=0.0,
             max_value=200_000_000.0,
-            value=float(parameters["budget"]),
+            value=float(preset["budget"]),
             step=1_000_000.0,
+            key=f"{preset_key}__budget",
         )
 
         options = {"budget": budget}
@@ -454,24 +564,43 @@ def build_options_ui(parameters):
                 f"{category}",
                 min_value=0.0,
                 max_value=200.0,
-                value=float(forecast),
+                value=float(preset.get(option_key("forecast", category), forecast)),
                 step=1.0,
+                key=f"{preset_key}__{option_key('forecast', category)}",
             )
 
         st.subheader("Recovery & Limits")
-        options["base_usage_multiplier"] = st.slider("Base usage multiplier", 0.0, 2.0, 1.0, 0.05)
-        options["discount_usage_multiplier"] = st.slider("Discount usage multiplier", 0.0, 2.0, 1.0, 0.05)
-        options["scrap_usage_multiplier"] = st.slider("Scrap usage multiplier", 0.0, 2.0, 1.0, 0.05)
-        options["short_penalty_multiplier"] = st.slider("Short penalty multiplier", 0.0, 5.0, 1.0, 0.1)
-        options["holding_penalty_multiplier"] = st.slider("Holding penalty multiplier", 0.0, 5.0, 1.0, 0.1)
-        options["recovery_multiplier"] = st.slider("Recovery multiplier", 0.0, 2.0, 1.0, 0.05)
+        options["base_usage_multiplier"] = st.slider(
+            "Base usage multiplier", 0.0, 2.0, float(preset["base_usage_multiplier"]), 0.05,
+            key=f"{preset_key}__base_usage_multiplier",
+        )
+        options["discount_usage_multiplier"] = st.slider(
+            "Discount usage multiplier", 0.0, 2.0, float(preset["discount_usage_multiplier"]), 0.05,
+            key=f"{preset_key}__discount_usage_multiplier",
+        )
+        options["scrap_usage_multiplier"] = st.slider(
+            "Scrap usage multiplier", 0.0, 2.0, float(preset["scrap_usage_multiplier"]), 0.05,
+            key=f"{preset_key}__scrap_usage_multiplier",
+        )
+        options["short_penalty_multiplier"] = st.slider(
+            "Short penalty multiplier", 0.0, 5.0, float(preset["short_penalty_multiplier"]), 0.1,
+            key=f"{preset_key}__short_penalty_multiplier",
+        )
+        options["holding_penalty_multiplier"] = st.slider(
+            "Holding penalty multiplier", 0.0, 5.0, float(preset["holding_penalty_multiplier"]), 0.1,
+            key=f"{preset_key}__holding_penalty_multiplier",
+        )
+        options["recovery_multiplier"] = st.slider(
+            "Recovery multiplier", 0.0, 2.0, float(preset["recovery_multiplier"]), 0.05,
+            key=f"{preset_key}__recovery_multiplier",
+        )
 
         submitted = st.form_submit_button("Run optimization", use_container_width=True)
 
     cloud_config = {
         "api_key": get_secret("NEXTMV_API_KEY", ""),
-        "app_id": app_id.strip(),
-        "instance_id": instance_id.strip() or "devint",
+        "app_id": get_secret("NEXTMV_APP_ID", "steel-center"),
+        "instance_id": get_secret("NEXTMV_INSTANCE_ID", "devint"),
     }
     return options, cloud_config, submitted
 
@@ -489,10 +618,7 @@ def friendly_cloud_error(error):
     if not error:
         return None
     if "application-id with identifier" in error or "status code 404" in error:
-        return (
-            "Nextmv could not find the App ID. Check the App ID field in the sidebar, "
-            "confirm the app was pushed, and make sure the API key belongs to the same Nextmv account."
-        )
+        return "The configured backend application was not found. Check Streamlit Cloud secrets."
     if "NEXTMV_API_KEY" in error:
         return "NEXTMV_API_KEY is not configured. Add it to Streamlit Cloud secrets."
     return error
@@ -524,7 +650,7 @@ def render_charts(assets):
 
 
 def render_tables(solution):
-    tabs = st.tabs(["Purchases", "Demand", "Dead Stock", "Options", "JSON"])
+    tabs = st.tabs(["Purchases", "Demand", "Dead Stock", "Options", "Downloads", "JSON"])
 
     with tabs[0]:
         st.dataframe(pd.DataFrame(solution["purchase_recommendations"]), use_container_width=True)
@@ -542,6 +668,14 @@ def render_tables(solution):
         st.dataframe(options_df, use_container_width=True)
 
     with tabs[4]:
+        st.download_button(
+            "Download solution JSON",
+            data=json.dumps({"solution": solution}, indent=2),
+            file_name="steel_solution.json",
+            mime="application/json",
+        )
+
+    with tabs[5]:
         st.json(solution)
         st.download_button(
             "Download solution JSON",
@@ -558,11 +692,22 @@ def main():
     st.title("Steel Inventory Optimization")
     st.caption("Scenario planning for purchasing, dead-stock recovery, and scrap liquidation.")
 
-    parameters = load_default_parameters()
+    parameters = load_working_parameters()
+    with st.expander("Import / export scenario", expanded=False):
+        apply_uploaded_parameters()
+        st.download_button(
+            "Download current scenario JSON",
+            data=json.dumps({"parameters": parameters}, indent=2),
+            file_name="steel_scenario.json",
+            mime="application/json",
+        )
+
     edited_parameters, input_errors = render_parameter_editor(parameters)
+    st.session_state.working_parameters = edited_parameters
     options, cloud_config, submitted = build_options_ui(edited_parameters)
 
     if st.sidebar.button("Reset scenario"):
+        st.session_state.working_parameters = load_default_parameters()
         st.session_state.pop("run_output", None)
         st.session_state.pop("sku_input_editor", None)
         st.session_state.pop("theta_input_editor", None)
@@ -590,8 +735,7 @@ def main():
             """
             **Backend notes**
 
-            - `Nextmv Cloud` requires a valid API key and the exact Nextmv App ID.
-            - A `404 application-id not found` error means the App ID does not exist in your Nextmv account or has not been pushed.
+            - The backend connection is configured privately in Streamlit Cloud secrets.
             - This public frontend does not contain the optimization model code.
             """
         )
