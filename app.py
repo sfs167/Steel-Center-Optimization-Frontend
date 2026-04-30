@@ -25,6 +25,12 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+    .stApp {
+        background:
+            radial-gradient(circle at top left, rgba(34, 197, 94, 0.12), transparent 28rem),
+            radial-gradient(circle at top right, rgba(14, 165, 233, 0.10), transparent 26rem),
+            linear-gradient(180deg, #f8fffb 0%, #ffffff 42%, #f8fafc 100%);
+    }
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
@@ -35,17 +41,19 @@ st.markdown(
         color: #0f172a;
     }
     section[data-testid="stSidebar"] {
-        background: #f1f5f9;
+        background: linear-gradient(180deg, #ecfdf5 0%, #f1f5f9 48%, #ffffff 100%);
+        border-right: 1px solid #dbeafe;
     }
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3 {
         color: #1e293b;
     }
     div[data-testid="stMetric"] {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid #dbeafe;
         border-radius: 8px;
         padding: 14px 16px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
     }
     div[data-testid="stMetricLabel"] {
         color: #475569;
@@ -57,20 +65,25 @@ st.markdown(
         white-space: nowrap;
     }
     .status-box {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background: linear-gradient(90deg, #ecfdf5, #eff6ff);
+        border: 1px solid #bfdbfe;
         border-radius: 8px;
         padding: 12px 16px;
         color: #475569;
         margin: 12px 0 18px 0;
     }
     .intro-box {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid #dbeafe;
         border-radius: 8px;
         padding: 18px 20px;
         color: #334155;
         margin-top: 18px;
+    }
+    .unit-note {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
     }
     </style>
     """,
@@ -265,6 +278,10 @@ def render_parameter_editor(parameters):
     edited = deepcopy(parameters)
     st.subheader("Input Data")
     st.caption("Edit SKU-level inputs here. Forecast and budget are controlled by the sidebar sliders.")
+    st.markdown(
+        '<div class="unit-note">Units: quantities are in MT, money values are in INR, share/usage/theta fields are ratios.</div>',
+        unsafe_allow_html=True,
+    )
 
     counts = scenario_counts(edited)
     cols = st.columns(5)
@@ -286,22 +303,22 @@ def render_parameter_editor(parameters):
             column_config={
                 "category": st.column_config.TextColumn("Category"),
                 "sku": st.column_config.TextColumn("SKU"),
-                "forecast": st.column_config.NumberColumn("Forecast", min_value=0.0, step=1.0),
-                "stock": st.column_config.NumberColumn("Stock", min_value=0.0, step=1.0),
-                "dead_stock": st.column_config.NumberColumn("Dead stock", min_value=0.0, step=1.0),
-                "scrap_stock": st.column_config.NumberColumn("Scrap stock", min_value=0.0, step=1.0),
-                "purchase_cost": st.column_config.NumberColumn("Purchase cost", min_value=0.0, step=500.0),
-                "selling_price": st.column_config.NumberColumn("Selling price", min_value=0.0, step=500.0),
-                "share_lower": st.column_config.NumberColumn("Share lower", min_value=0.0, max_value=1.0, step=0.01),
-                "share_upper": st.column_config.NumberColumn("Share upper", min_value=0.0, max_value=1.0, step=0.01),
-                "alpha_base": st.column_config.NumberColumn("Base usage", min_value=0.0, step=0.01),
-                "alpha_discount": st.column_config.NumberColumn("Discount usage", min_value=0.0, step=0.01),
-                "alpha_scrap": st.column_config.NumberColumn("Scrap usage", min_value=0.0, step=0.01),
-                "short_penalty": st.column_config.NumberColumn("Short penalty", min_value=0.0, step=500.0),
-                "hold_penalty": st.column_config.NumberColumn("Hold penalty", min_value=0.0, step=100.0),
-                "rec_base": st.column_config.NumberColumn("Base recovery", min_value=0.0, step=500.0),
-                "rec_promo": st.column_config.NumberColumn("Promo recovery", min_value=0.0, step=500.0),
-                "rec_scrap": st.column_config.NumberColumn("Scrap recovery", min_value=0.0, step=500.0),
+                "forecast": st.column_config.NumberColumn("Forecast (MT)", min_value=0.0, step=1.0),
+                "stock": st.column_config.NumberColumn("Stock (MT)", min_value=0.0, step=1.0),
+                "dead_stock": st.column_config.NumberColumn("Dead stock (MT)", min_value=0.0, step=1.0),
+                "scrap_stock": st.column_config.NumberColumn("Scrap stock (MT)", min_value=0.0, step=1.0),
+                "purchase_cost": st.column_config.NumberColumn("Purchase cost (INR/MT)", min_value=0.0, step=500.0),
+                "selling_price": st.column_config.NumberColumn("Selling price (INR/MT)", min_value=0.0, step=500.0),
+                "share_lower": st.column_config.NumberColumn("Share lower (ratio)", min_value=0.0, max_value=1.0, step=0.01),
+                "share_upper": st.column_config.NumberColumn("Share upper (ratio)", min_value=0.0, max_value=1.0, step=0.01),
+                "alpha_base": st.column_config.NumberColumn("Base usage (ratio)", min_value=0.0, step=0.01),
+                "alpha_discount": st.column_config.NumberColumn("Discount usage (ratio)", min_value=0.0, step=0.01),
+                "alpha_scrap": st.column_config.NumberColumn("Scrap usage (ratio)", min_value=0.0, step=0.01),
+                "short_penalty": st.column_config.NumberColumn("Short penalty (INR/MT)", min_value=0.0, step=500.0),
+                "hold_penalty": st.column_config.NumberColumn("Hold penalty (INR/MT)", min_value=0.0, step=100.0),
+                "rec_base": st.column_config.NumberColumn("Base recovery (INR/MT)", min_value=0.0, step=500.0),
+                "rec_promo": st.column_config.NumberColumn("Promo recovery (INR/MT)", min_value=0.0, step=500.0),
+                "rec_scrap": st.column_config.NumberColumn("Scrap recovery (INR/MT)", min_value=0.0, step=500.0),
                 "base_channel": st.column_config.CheckboxColumn("Base"),
                 "discount_channel": st.column_config.CheckboxColumn("Promo"),
                 "scrap_channel": st.column_config.CheckboxColumn("Scrap"),
@@ -327,7 +344,7 @@ def render_parameter_editor(parameters):
                 "target_sku": st.column_config.TextColumn("Target SKU"),
                 "driver_category": st.column_config.TextColumn("Driver category"),
                 "driver_sku": st.column_config.TextColumn("Driver SKU"),
-                "value": st.column_config.NumberColumn("Value", min_value=0.0, step=0.01),
+                "value": st.column_config.NumberColumn("Value (ratio)", min_value=0.0, step=0.01),
             },
         )
         edited["theta"] = normalize_theta_rows(edited_theta_df)
@@ -547,7 +564,7 @@ def build_options_ui(parameters):
 
     with st.sidebar.form("scenario_form"):
         budget = st.slider(
-            "Budget",
+            "Budget (INR)",
             min_value=0.0,
             max_value=200_000_000.0,
             value=float(preset["budget"]),
@@ -561,7 +578,7 @@ def build_options_ui(parameters):
         for category in parameters["categories"]:
             forecast = next(row["forecast"] for row in parameters["skus"] if row["category"] == category)
             options[option_key("forecast", category)] = st.slider(
-                f"{category}",
+                f"{category} forecast (MT)",
                 min_value=0.0,
                 max_value=200.0,
                 value=float(preset.get(option_key("forecast", category), forecast)),
@@ -571,27 +588,27 @@ def build_options_ui(parameters):
 
         st.subheader("Recovery & Limits")
         options["base_usage_multiplier"] = st.slider(
-            "Base usage multiplier", 0.0, 2.0, float(preset["base_usage_multiplier"]), 0.05,
+            "Base usage multiplier (x)", 0.0, 2.0, float(preset["base_usage_multiplier"]), 0.05,
             key=f"{preset_key}__base_usage_multiplier",
         )
         options["discount_usage_multiplier"] = st.slider(
-            "Discount usage multiplier", 0.0, 2.0, float(preset["discount_usage_multiplier"]), 0.05,
+            "Discount usage multiplier (x)", 0.0, 2.0, float(preset["discount_usage_multiplier"]), 0.05,
             key=f"{preset_key}__discount_usage_multiplier",
         )
         options["scrap_usage_multiplier"] = st.slider(
-            "Scrap usage multiplier", 0.0, 2.0, float(preset["scrap_usage_multiplier"]), 0.05,
+            "Scrap usage multiplier (x)", 0.0, 2.0, float(preset["scrap_usage_multiplier"]), 0.05,
             key=f"{preset_key}__scrap_usage_multiplier",
         )
         options["short_penalty_multiplier"] = st.slider(
-            "Short penalty multiplier", 0.0, 5.0, float(preset["short_penalty_multiplier"]), 0.1,
+            "Short penalty multiplier (x)", 0.0, 5.0, float(preset["short_penalty_multiplier"]), 0.1,
             key=f"{preset_key}__short_penalty_multiplier",
         )
         options["holding_penalty_multiplier"] = st.slider(
-            "Holding penalty multiplier", 0.0, 5.0, float(preset["holding_penalty_multiplier"]), 0.1,
+            "Holding penalty multiplier (x)", 0.0, 5.0, float(preset["holding_penalty_multiplier"]), 0.1,
             key=f"{preset_key}__holding_penalty_multiplier",
         )
         options["recovery_multiplier"] = st.slider(
-            "Recovery multiplier", 0.0, 2.0, float(preset["recovery_multiplier"]), 0.05,
+            "Recovery multiplier (x)", 0.0, 2.0, float(preset["recovery_multiplier"]), 0.05,
             key=f"{preset_key}__recovery_multiplier",
         )
 
@@ -614,6 +631,10 @@ def format_money(value):
     return f"{value:,.2f}"
 
 
+def format_qty(value):
+    return f"{float(value):,.2f} MT"
+
+
 def friendly_cloud_error(error):
     if not error:
         return None
@@ -629,13 +650,39 @@ def metric_row(solution):
     recovery = solution["earnings_from_dead_stock_recovery"]
     stuck = solution["dead_stock_remaining_value"]
     scrap = solution["scrap_stock_value"]
+    budget = summary["total_purchase_spend"] + summary["remaining_budget"]
+    spend_share = summary["total_purchase_spend"] / budget if budget else 0
+    remaining_share = summary["remaining_budget"] / budget if budget else 0
 
     cols = st.columns(5)
-    cols[0].metric("Purchase Spend", format_money(summary["total_purchase_spend"]))
-    cols[1].metric("Remaining Budget", format_money(summary["remaining_budget"]))
-    cols[2].metric("Total Recovery", format_money(recovery["total_recovery"]))
-    cols[3].metric("Dead Stock Stuck", format_money(stuck["total_stuck_dead_stock_amount"]))
-    cols[4].metric("Scrap Remaining", format_money(scrap["remaining_scrap_amount"]))
+    cols[0].metric(
+        "Purchase Spend (INR)",
+        format_money(summary["total_purchase_spend"]),
+        delta=f"-{spend_share:.1%} of budget",
+        delta_color="inverse",
+    )
+    cols[1].metric(
+        "Remaining Budget (INR)",
+        format_money(summary["remaining_budget"]),
+        delta=f"+{remaining_share:.1%} available",
+    )
+    cols[2].metric(
+        "Total Recovery (INR)",
+        format_money(recovery["total_recovery"]),
+        delta="+Recovered",
+    )
+    cols[3].metric(
+        "Dead Stock Stuck (INR)",
+        format_money(stuck["total_stuck_dead_stock_amount"]),
+        delta="-Stuck value",
+        delta_color="inverse",
+    )
+    cols[4].metric(
+        "Scrap Remaining (INR)",
+        format_money(scrap["remaining_scrap_amount"]),
+        delta="-Remaining",
+        delta_color="inverse",
+    )
 
 
 def render_charts(assets):
@@ -653,13 +700,32 @@ def render_tables(solution):
     tabs = st.tabs(["Purchases", "Demand", "Dead Stock", "Options", "Downloads", "JSON"])
 
     with tabs[0]:
-        st.dataframe(pd.DataFrame(solution["purchase_recommendations"]), use_container_width=True)
+        purchases = pd.DataFrame(solution["purchase_recommendations"]).rename(
+            columns={"purchase_qty": "purchase_qty_mt"}
+        )
+        st.dataframe(purchases, use_container_width=True)
 
     with tabs[1]:
-        st.dataframe(pd.DataFrame(solution["demand_allocation"]), use_container_width=True)
+        demand = pd.DataFrame(solution["demand_allocation"]).rename(
+            columns={
+                "s": "sold_qty_mt",
+                "x": "purchase_qty_mt",
+                "dem": "demand_qty_mt",
+                "short": "shortage_qty_mt",
+            }
+        )
+        st.dataframe(demand, use_container_width=True)
 
     with tabs[2]:
-        st.dataframe(pd.DataFrame(solution["dead_stock_actions"]), use_container_width=True)
+        dead_stock = pd.DataFrame(solution["dead_stock_actions"]).rename(
+            columns={
+                "base": "base_used_mt",
+                "promo": "promo_used_mt",
+                "scrap": "scrap_used_mt",
+                "remaining": "remaining_dead_stock_mt",
+            }
+        )
+        st.dataframe(dead_stock, use_container_width=True)
 
     with tabs[3]:
         options_df = pd.DataFrame(
@@ -673,6 +739,7 @@ def render_tables(solution):
             data=json.dumps({"solution": solution}, indent=2),
             file_name="steel_solution.json",
             mime="application/json",
+            key="download_solution_json_tab",
         )
 
     with tabs[5]:
@@ -682,6 +749,7 @@ def render_tables(solution):
             data=json.dumps({"solution": solution}, indent=2),
             file_name="steel_solution.json",
             mime="application/json",
+            key="download_solution_json_raw_tab",
         )
 
 
@@ -759,7 +827,7 @@ def main():
         <div class="status-box">
         Stage 1: <b>{solution['status']['stage_1']}</b> |
         Stage 2: <b>{solution['status']['stage_2']}</b> |
-        Purchase objective: <b>{format_money(solution['objective']['stage_2_purchase_cost_value'])}</b>
+        Purchase objective: <b>{format_money(solution['objective']['stage_2_purchase_cost_value'])} INR</b>
         </div>
         """,
         unsafe_allow_html=True,
